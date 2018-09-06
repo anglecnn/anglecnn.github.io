@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="数据结构,树," />
 
 
 
@@ -79,13 +79,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/linux服务器-挖矿木马/index.html">
+<meta name="description" content="树的定义 树是由n(n&amp;gt;=0)个节点组成的有限集合  1). 如果n=0,称为空树  2). 如果n&amp;gt;0,则 a).有一个特定的称之为根(root)的节点,它只有直接后继,但没有直接前驱  b).除根以外的其他节点划分为m(m&amp;gt;=0)个互不相交的有限集合T0,T1,….T~(m-1),每个集合又是一棵树,并且称之为根的子树(subTree).   树家族中的概念 树的结点包含一个">
+<meta name="keywords" content="数据结构,树">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构之树的基本概念">
+<meta property="og:url" content="http://yoursite.com/2018/09/05/数据结构之树的基本概念/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="树的定义 树是由n(n&amp;gt;=0)个节点组成的有限集合  1). 如果n=0,称为空树  2). 如果n&amp;gt;0,则 a).有一个特定的称之为根(root)的节点,它只有直接后继,但没有直接前驱  b).除根以外的其他节点划分为m(m&amp;gt;=0)个互不相交的有限集合T0,T1,….T~(m-1),每个集合又是一棵树,并且称之为根的子树(subTree).   树家族中的概念 树的结点包含一个">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180905215418845.png">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tNbRwly1fuz0pnfcvmj30mo0kw433.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006tNbRwly1fuz0xuko80j30qw0bkn4y.jpg">
+<meta property="og:updated_time" content="2018-09-05T14:34:58.861Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="数据结构之树的基本概念">
+<meta name="twitter:description" content="树的定义 树是由n(n&amp;gt;=0)个节点组成的有限集合  1). 如果n=0,称为空树  2). 如果n&amp;gt;0,则 a).有一个特定的称之为根(root)的节点,它只有直接后继,但没有直接前驱  b).除根以外的其他节点划分为m(m&amp;gt;=0)个互不相交的有限集合T0,T1,….T~(m-1),每个集合又是一棵树,并且称之为根的子树(subTree).   树家族中的概念 树的结点包含一个">
+<meta name="twitter:image" content="http://yoursite.com/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180905215418845.png">
 
 
 
@@ -115,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/linux服务器-挖矿木马/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/09/05/数据结构之树的基本概念/"/>
 
 
 
 
 
-  <title>标签: linux服务器,挖矿木马 | Hexo</title>
+  <title>数据结构之树的基本概念 | Hexo</title>
   
 
 
@@ -140,7 +149,7 @@
     
   
 
-  <div class="container sidebar-position-right ">
+  <div class="container sidebar-position-right page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -274,54 +283,217 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>linux服务器,挖矿木马<small>标签</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/05/数据结构之树的基本概念/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="anglecnn">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/09/01/服务器中挖矿木马的排查之旅/" itemprop="url">
-              
-                <span itemprop="name">服务器中挖矿木马的排查之旅</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">数据结构之树的基本概念</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-09-01T22:51:52+08:00"
-              content="2018-09-01" >
-          09-01
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-05T21:15:20+08:00">
+                2018-09-05
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据结构/" itemprop="url" rel="index">
+                    <span itemprop="name">数据结构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h1><ol>
+<li><p>树是由n(n&gt;=0)个节点组成的有限集合</p>
+<p> 1). 如果n=0,称为空树</p>
+<p> 2). 如果n&gt;0,则</p>
+<pre><code>a).有一个特定的称之为根(root)的节点,它只有直接后继,但没有直接前驱
+
+b).除根以外的其他节点划分为m(m&gt;=0)个互不相交的有限集合T0,T1,….T~(m-1),每个集合又是一棵树,并且称之为根的子树(subTree).
+</code></pre></li>
+</ol>
+<h2 id="树家族中的概念"><a href="#树家族中的概念" class="headerlink" title="树家族中的概念"></a>树家族中的概念</h2><ol>
+<li><p>树的结点包含一个数据及若干指向子树的分支.</p>
+</li>
+<li><p>结点拥有的子树数称为结点的度</p>
+<p> 1).度为0的结点称为叶结点</p>
+<p> 2).度不为0的节点称之为分支节点</p>
+</li>
+<li><p>树的度定义为所有结点中的度的最大值</p>
+<p><img src="/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180905215418845.png" alt="image-20180905215418845"></p>
+</li>
+<li><p>结点的直接后继称为该结点的孩子</p>
+<ol>
+<li>相应的,该结点称为孩子的双亲</li>
+</ol>
+</li>
+<li><p>节点的额孩子的孩子的……称为该结点的子孙</p>
+<ol>
+<li>相应的,该结点称为子孙的祖先</li>
+</ol>
+</li>
+<li><p>同一个双亲的孩子之间互称兄弟</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fuz0pnfcvmj30mo0kw433.jpg" alt=""></p>
+</li>
+</ol>
+<ol start="7">
+<li><p>结点的层次</p>
+<ol>
+<li>根为第一层</li>
+<li>根的孩子为第二层</li>
+</ol>
+</li>
+<li><p>树中结点的最大层次称之为树的深度或者高度</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fuz0xuko80j30qw0bkn4y.jpg" alt=""></p>
+</li>
+<li><p>如果树中结点的各子树从左向右是有次序的,子树间不能互换位置,则称该树为有序树,否则为无序树.</p>
+</li>
+</ol>
+<h2 id="森林"><a href="#森林" class="headerlink" title="森林"></a>森林</h2><p>森林是由n(n&gt;=0)棵互不相交的树组成的集合</p>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据结构/" rel="tag"># 数据结构</a>
+          
+            <a href="/tags/树/" rel="tag"># 树</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/01/服务器中挖矿木马的排查之旅/" rel="next" title="服务器中挖矿木马的排查之旅">
+                <i class="fa fa-chevron-left"></i> 服务器中挖矿木马的排查之旅
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -329,6 +501,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -349,8 +525,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -410,6 +595,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#树的定义"><span class="nav-number">1.</span> <span class="nav-text">树的定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#树家族中的概念"><span class="nav-number">1.1.</span> <span class="nav-text">树家族中的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#森林"><span class="nav-number">1.2.</span> <span class="nav-text">森林</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -550,6 +751,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
