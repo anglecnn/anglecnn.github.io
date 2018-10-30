@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="spring框架," />
 
 
 
@@ -79,14 +79,18 @@
 
 
 
+<meta name="description" content="今天在IDEA上使用dubbox+ssm框架报错: ​    ==java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded== ​    报错原因: ​        1.缺少spring-core的jar包 ​        2.工程目录下的pom文件中引入了版本为4.2.4的spring-core的java包,但是在">
+<meta name="keywords" content="spring框架">
 <meta property="og:type" content="article">
-<meta property="og:title" content="你好-Hexo">
-<meta property="og:url" content="http://yoursite.com/2018/09/01/你好-Hexo/index.html">
+<meta property="og:title" content="Spring框架报错java.lang.NoClassDefFoundError: org&#x2F;springframework&#x2F;core&#x2F;ErrorCoded">
+<meta property="og:url" content="http://yoursite.com/2018/09/15/Spring框架报错java-lang-NoClassDefFoundError-org-springframework-core-ErrorCoded/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="今天在IDEA上使用dubbox+ssm框架报错: ​    ==java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded== ​    报错原因: ​        1.缺少spring-core的jar包 ​        2.工程目录下的pom文件中引入了版本为4.2.4的spring-core的java包,但是在">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-31T18:06:22.723Z">
+<meta property="og:updated_time" content="2018-09-15T08:26:22.050Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="你好-Hexo">
+<meta name="twitter:title" content="Spring框架报错java.lang.NoClassDefFoundError: org&#x2F;springframework&#x2F;core&#x2F;ErrorCoded">
+<meta name="twitter:description" content="今天在IDEA上使用dubbox+ssm框架报错: ​    ==java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded== ​    报错原因: ​        1.缺少spring-core的jar包 ​        2.工程目录下的pom文件中引入了版本为4.2.4的spring-core的java包,但是在">
 
 
 
@@ -116,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/09/01/你好-Hexo/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/09/15/Spring框架报错java-lang-NoClassDefFoundError-org-springframework-core-ErrorCoded/"/>
 
 
 
 
 
-  <title>你好-Hexo | Hexo</title>
+  <title>Spring框架报错java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded | Hexo</title>
   
 
 
@@ -289,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/01/你好-Hexo/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/15/Spring框架报错java-lang-NoClassDefFoundError-org-springframework-core-ErrorCoded/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="anglecnn">
@@ -306,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">你好-Hexo</h1>
+          <h1 class="post-title" itemprop="name headline">Spring框架报错java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded</h1>
         
 
         <div class="post-meta">
@@ -318,8 +322,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-01T02:06:22+08:00">
-                2018-09-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-15T16:19:51+08:00">
+                2018-09-15
               </time>
             
 
@@ -328,6 +332,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssm框架/" itemprop="url" rel="index">
+                    <span itemprop="name">ssm框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -356,7 +382,12 @@
       
 
       
-        
+        <p>今天在IDEA上使用dubbox+ssm框架报错:</p>
+<p>​    ==java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded==</p>
+<p>​    报错原因:</p>
+<p>​        1.缺少spring-core的jar包</p>
+<p>​        2.工程目录下的pom文件中引入了版本为4.2.4的spring-core的java包,但是在其中一个模块中的pom.xml中引入了版本为5.0.5的spring-core的jar包,所以,将模块中的spring-core的maven依赖删除,问题解决.</p>
+
       
     </div>
     
@@ -371,6 +402,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/spring框架/" rel="tag"># spring框架</a>
+          
+        </div>
+      
 
       
       
@@ -380,14 +417,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/09/06/二叉树/" rel="next" title="二叉树">
+                <i class="fa fa-chevron-left"></i> 二叉树
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/09/01/数据结构之线性表/" rel="prev" title="数据结构之线性表">
-                数据结构之线性表 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/09/15/spring多实现类的解决方案/" rel="prev" title="spring多实现类的解决方案">
+                spring多实现类的解决方案 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>

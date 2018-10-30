@@ -289,6 +289,657 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/Map端连接/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="anglecnn">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/29/Map端连接/" itemprop="url">Map端连接</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T15:14:21+08:00">
+                2018-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="MapReduce的Map端连接"><a href="#MapReduce的Map端连接" class="headerlink" title="MapReduce的Map端连接"></a>MapReduce的Map端连接</h2><p>定义：在两个大规模输入数据集之间的map端连接会在数据到达map函数之前就执行连接操作。为达到目的，各map的输入数据必须先分区并且以特定方式排序。各个输入数据集被划分为相同数量的分区，并且均按相同的键(连接键)排序。同一键的所有记录均会放在同一分区之中。</p>
+<p>map端连接操作可以连接多个作业的输出，只要这些作业的reducer数量相同、键相同并且输出文件是不可切分的(例如，小于一个HDFS块，或gzip压缩)。</p>
+<h3 id="map端连接的使用场景"><a href="#map端连接的使用场景" class="headerlink" title="map端连接的使用场景"></a>map端连接的使用场景</h3><p>实现两个表的join操作，其中一个表数据量小，一个数据量大。这就适合使用map端连接，因为可以将小表加载到内存中进行操作。可以提高map的效率。</p>
+<p>1.map之前执行，加载文件到内存，可以使用map接口中的setup方法。</p>
+<p>map方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hdfs.mr.mapjoin;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.FSDataInputStream;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.FileSystem;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.LongWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.NullWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * join，Map端连接</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapJoinMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">NullWritable</span>&gt;</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Map&lt;String,String&gt; allCustomers = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        Configuration conf = context.getConfiguration();</span><br><span class="line">        FileSystem fileSystem = FileSystem.get(conf);</span><br><span class="line">        FSDataInputStream inputStream = fileSystem.open(<span class="keyword">new</span> Path(<span class="string">"/tmp/bigdata/customer.txt"</span>));</span><br><span class="line">        <span class="comment">//得到缓冲区</span></span><br><span class="line">        BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(inputStream));</span><br><span class="line"></span><br><span class="line">        String line = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> ((line = br.readLine())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="comment">//得到cid</span></span><br><span class="line">            String cid = line.substring(<span class="number">0</span>,line.indexOf(<span class="string">","</span>));</span><br><span class="line">            allCustomers.put(cid,line);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//订单信息</span></span><br><span class="line">        String line = value.toString();</span><br><span class="line">        <span class="comment">//提取客户ID</span></span><br><span class="line">        String cid = line.substring(line.lastIndexOf(<span class="string">","</span>) + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">//订单信息</span></span><br><span class="line">        String orderInfo = line.substring(<span class="number">0</span>,line.lastIndexOf(<span class="string">","</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//连接customer和order</span></span><br><span class="line">        String customer = allCustomers.get(cid);</span><br><span class="line">        context.write(<span class="keyword">new</span> Text(customer+<span class="string">","</span>+orderInfo),NullWritable.get());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.主函数方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hdfs.mr.mapjoin;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> hdfs.mr.WCMapper;</span><br><span class="line"><span class="keyword">import</span> hdfs.mr.WCReducer;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.NullWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.TextInputFormat;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapJoinApp</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException, InterruptedException </span>&#123;</span><br><span class="line">        Configuration conf = <span class="keyword">new</span> Configuration();</span><br><span class="line">        conf.set(<span class="string">"fs.defaultFS"</span>,<span class="string">"file:///"</span>);</span><br><span class="line">        Job job = Job.getInstance(conf);</span><br><span class="line">        job.setJobName(<span class="string">"MapJoinApp"</span>);</span><br><span class="line">        job.setJarByClass(MapJoinApp.class);</span><br><span class="line">        job.setInputFormatClass(TextInputFormat.class); <span class="comment">//设置输入格式</span></span><br><span class="line">        FileInputFormat.addInputPath(job,<span class="keyword">new</span> Path(<span class="string">"/tmp/bigdata/orders.txt"</span>));</span><br><span class="line">        FileOutputFormat.setOutputPath(job,<span class="keyword">new</span> Path(<span class="string">"/tmp/mapjoin/output"</span>));</span><br><span class="line">        job.setNumReduceTasks(<span class="number">0</span>); <span class="comment">//设置reduce的个数</span></span><br><span class="line">        job.setMapperClass(MapJoinMapper.class); <span class="comment">//设置mapper类</span></span><br><span class="line">        job.setOutputKeyClass(Text.class);</span><br><span class="line">        job.setOutputValueClass(NullWritable.class);</span><br><span class="line">        job.waitForCompletion(<span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.测试数据</p>
+<p>customer.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1,tom,12   #字段含义，1.用户id，2.用户名，3.用户年龄</span><br><span class="line">2,lucy,13</span><br><span class="line">3,jack,14</span><br><span class="line">4,john,15</span><br></pre></td></tr></table></figure>
+<p>orders.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#各字段含义：1.订单id，2.订单号，3.价格，4.用户id</span><br><span class="line">1,no001,12.23,1</span><br><span class="line">2,no002,13.23,1</span><br><span class="line">3,no003,14.23,2</span><br><span class="line">4,no004,15.23,2</span><br><span class="line">5,no005,16.23,2</span><br><span class="line">6,no005,17.23,3</span><br><span class="line">7,no005,18.23,3</span><br></pre></td></tr></table></figure>
+<p>4.最终结果(part-m-00000)；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1,tom,12,1,no001,12.23</span><br><span class="line">1,tom,12,2,no002,13.23</span><br><span class="line">2,lucy,13,3,no003,14.23</span><br><span class="line">2,lucy,13,4,no004,15.23</span><br><span class="line">2,lucy,13,5,no005,16.23</span><br><span class="line">3,jack,14,6,no005,17.23</span><br><span class="line">3,jack,14,7,no005,18.23</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/15/spring多实现类的解决方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="anglecnn">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/15/spring多实现类的解决方案/" itemprop="url">spring多实现类的解决方案</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-15T21:54:46+08:00">
+                2018-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssm框架/" itemprop="url" rel="index">
+                    <span itemprop="name">ssm框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>目的：</strong>一个接口多个实现时，根据不同的条件调用不用的实现</p>
+<p>1、有如下接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pay</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">pay</span><span class="params">(Map&lt;String,Object&gt; map)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2、有如下两个实现</p>
+<p>实现一：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"weixinPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WeixinPay</span> <span class="keyword">implements</span> <span class="title">Pay</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">pay</span><span class="params">(Map&lt;String, Object&gt; map)</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"weixinpay"</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现二：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"aliPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AliPay</span> <span class="keyword">implements</span> <span class="title">Pay</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">pay</span><span class="params">(Map&lt;String, Object&gt; map)</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"alipay"</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、根据不同的条件调用不同的实现</p>
+<p>方法一：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Resource</span>(name=<span class="string">"weixinPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay weixinPay;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Resource</span>(name=<span class="string">"aliPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay aliPay;</span><br></pre></td></tr></table></figure>
+<p>方法二：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"weixinPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay weixinPay;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"aliPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay aliPay;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/15/Spring框架报错java-lang-NoClassDefFoundError-org-springframework-core-ErrorCoded/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="anglecnn">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/15/Spring框架报错java-lang-NoClassDefFoundError-org-springframework-core-ErrorCoded/" itemprop="url">Spring框架报错java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-15T16:19:51+08:00">
+                2018-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssm框架/" itemprop="url" rel="index">
+                    <span itemprop="name">ssm框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>今天在IDEA上使用dubbox+ssm框架报错:</p>
+<p>​    ==java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded==</p>
+<p>​    报错原因:</p>
+<p>​        1.缺少spring-core的jar包</p>
+<p>​        2.工程目录下的pom文件中引入了版本为4.2.4的spring-core的java包,但是在其中一个模块中的pom.xml中引入了版本为5.0.5的spring-core的jar包,所以,将模块中的spring-core的maven依赖删除,问题解决.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/06/二叉树/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="anglecnn">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/06/二叉树/" itemprop="url">二叉树</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-06T21:18:16+08:00">
+                2018-09-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据结构/" itemprop="url" rel="index">
+                    <span itemprop="name">数据结构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="二叉树的定义"><a href="#二叉树的定义" class="headerlink" title="二叉树的定义"></a>二叉树的定义</h1><p>二叉树是由n(n&gt;=0)个结点组成的有限集合,此集合或者为空,或者由一个根节点加上两棵分别称为左右子树的,互不交叉的二叉树组成.</p>
+<p><img src="/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180911205321902.png" alt="image-20180911205321902"></p>
+<h2 id="二叉树示例"><a href="#二叉树示例" class="headerlink" title="二叉树示例"></a>二叉树示例</h2><p><img src="/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180912204843399.png" alt="image-20180912204843399"></p>
+<h3 id="图5-4释义"><a href="#图5-4释义" class="headerlink" title="图5-4释义:"></a>图5-4释义:</h3><p>​    结点A是根节点,B,C是A的子结点.结点B与D构成一棵子树.B的两个子结点:左子树是空树,右子结点是D.结点A,C和E是G的祖先,结点D,E和F的层数为3,结点A的层数为1.从A到G经过C,E两个顶点三条边,形成一条长度为3的路径.结点D,G,H和I是叶结点,A,B,C,E和F是内部结点.结点I的深度是4,这棵树的高度为4.</p>
+<h3 id="二叉树和一般树的区别"><a href="#二叉树和一般树的区别" class="headerlink" title="二叉树和一般树的区别"></a>二叉树和一般树的区别</h3><p>   1.二叉树可以为空树,即不包含任何结点,一般树至少应有一个结点</p>
+<p>   2.二叉树区别于度数为2的有序树,在二叉树中允许某些结点只有右子树而没有左子树;而有序树中,一个结点如果没有第一子树就不可能有第二子树的存在.如图5-5所示</p>
+<p><img src="/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180912205914657.png" alt="image-20180912205914657"></p>
+<p>因此,二叉树不是树的特殊情形,它们是两种不同的数据结构.</p>
+<h2 id="二叉树的性质"><a href="#二叉树的性质" class="headerlink" title="二叉树的性质"></a>二叉树的性质</h2><h3 id="性质1-二叉树第i-i-geq1-层上的结点树最多为-2-i-1"><a href="#性质1-二叉树第i-i-geq1-层上的结点树最多为-2-i-1" class="headerlink" title="性质1: 二叉树第i($i\geq1$)层上的结点树最多为$2^{i-1}$"></a>性质1: 二叉树第i($i\geq1$)层上的结点树最多为$2^{i-1}$</h3><p>证明:第一层有一个结点,第二层最多有两个结点,第三层最多有四个结点,以此类推.数学归纳法证明如下:</p>
+<p>​    归纳基础:i=1时,有$2^{i-1}$=$2^0$=1.因为第一层上只有一个结点,即根结点,所以命题成立.</p>
+<p>​    归纳假设:假设对所有的j(1$\leq$j&lt;i)命题成立,即第j层上至多有$2^{j-1}$个结点,需要证明j=i时命题亦成立.</p>
+<p>​    归纳步骤:根据归纳假设,第i-1层上至多有$2^{i-2}$个结点.由于二叉树的每个结点至多有两个儿子,故第i层上的结点数至多是第i-1层上的最大结点数的2倍,即j=i时,该层上至多有2*$2^{i-2}$=$2^{i-1}$个结点,因此命题成立.</p>
+<h3 id="性质2-高度为k的二叉树最多有-2-k-1个结点"><a href="#性质2-高度为k的二叉树最多有-2-k-1个结点" class="headerlink" title="性质2:高度为k的二叉树最多有$2^{k}$-1个结点"></a>性质2:高度为k的二叉树最多有$2^{k}$-1个结点</h3><p>​    根据性质1,将各层的结点个数相加,即可推导出性质2.即$\sum_{i\neq1}^k2^{i-1}=2^{k}-1$.</p>
+<h3 id="性质3-任何二叉树T-设-n-0-n-1-n-2-分别表示度数为0-1-2的结点个数-则-n-0-n-2-1"><a href="#性质3-任何二叉树T-设-n-0-n-1-n-2-分别表示度数为0-1-2的结点个数-则-n-0-n-2-1" class="headerlink" title="性质3:任何二叉树T,设$n_{0}$,$n_{1}$,$n_{2}$分别表示度数为0,1,2的结点个数,则$n_{0}$=$n_{2}$+1."></a>性质3:任何二叉树T,设$n_{0}$,$n_{1}$,$n_{2}$分别表示度数为0,1,2的结点个数,则$n_{0}$=$n_{2}$+1.</h3><p>​    证明:因为二叉树中所有结点的度数均不大于2,所以结点总数(记为n)应该等于0度结点数($n_{0}$),1度结点数(,$n_{1}$)和2度结点数(,$n_{2}$)之和:</p>
+<p>​        n=,$n_{0}$+$n_{1}$+$n_{2}$</p>
+<p>​    再者,1度结点有一个儿子,2度结点有两个儿子,所以二叉树中儿子结点的总数是,$n_{1}$+2$n_{2}$,二叉树中只有根节点不是任何结点的儿子,因此二叉树中的结点总数可以表示为:</p>
+<p>​        n=$n_{1}$+2$n_{2}$+1</p>
+<p>由上述两个公式可以得出$n_{0}$=$n_{2}$+1.</p>
+<p>由性质3可以推出:当$n_{2}$=0时,$n_{0}$=1.即该二叉树有一个起始结点(根)和一个终端结点(叶子),其他各结点有一个父亲一个儿子,二叉树退化为单链表.</p>
+<h3 id="满二叉树和完全二叉树"><a href="#满二叉树和完全二叉树" class="headerlink" title="满二叉树和完全二叉树"></a>满二叉树和完全二叉树</h3><h4 id="满二叉树定义"><a href="#满二叉树定义" class="headerlink" title="满二叉树定义"></a>满二叉树定义</h4><p>​    一个深度为k且有$2^{k}-1$个结点的二叉树称为满二叉树</p>
+<p>图5-6所示是深度分别为1,2,3的满二叉树.满二叉树的特点是每一层上的结点数都达到最大值,即对给定的深度,它是具有最多结点树的二叉树.满二叉树不存在度数为1的结点,每个分支结点均有两棵高度相同的子树,且树叶结点都在最下</p>
+<p><img src="/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180912214315069.png" alt="image-20180912214315069"></p>
+<h4 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h4><p>若设二叉树的深度为h，除第 h 层外，其它各层 (1～h-1) 的结点数都达到最大个数，第 h 层所有的结点都连续集中在最左边，这就是完全二叉树。</p>
+<p>完全二叉树是由<a href="http://baike.baidu.com/view/427110.htm" target="_blank" rel="noopener">满二叉树</a>而引出来的。对于深度为K的，有n个结点的二叉树，当且仅当其每一个结点都与深度为K的满二叉树中编号从1至n的结点一一对应时称之为完全二叉树。</p>
+<p>一棵二叉树至多只有最下面的两层上的结点的度数可以小于2，并且最下层上的结点都集中在该层最左边的若干位置上，则此二叉树成为完全二叉树。</p>
+<p>在完全二叉树中，若某个结点没有左儿子，那么它一定没有右儿子，即该结点必须是叶结点。</p>
+<p>如图5-7:</p>
+<p><img src="/var/folders/r0/rnlfmpyj71d0b93lgv8np4x40000gn/T/abnerworks.Typora/image-20180912214510514.png" alt="image-20180912214510514"></p>
+<p>由定义及示例可以看出满二叉树是完全二叉树,但完全二叉树不一定是满二叉树.</p>
+<h3 id="性质4-具有n个结点的完全二叉树-包括满二叉树-的高度为-left-lfloor-log-2-n-right-rfloor-1-或者-left-lceil-log-2-n-1-right-rceil"><a href="#性质4-具有n个结点的完全二叉树-包括满二叉树-的高度为-left-lfloor-log-2-n-right-rfloor-1-或者-left-lceil-log-2-n-1-right-rceil" class="headerlink" title="性质4:具有n个结点的完全二叉树(包括满二叉树)的高度为$\left \lfloor \log_2 n \right \rfloor$+1(或者)$\left \lceil  \log_2 {(n+1)}\right \rceil$."></a>性质4:具有n个结点的完全二叉树(包括满二叉树)的高度为$\left \lfloor \log_2 n \right \rfloor$+1(或者)$\left \lceil  \log_2 {(n+1)}\right \rceil$.</h3><p>证明：设所求完全二叉树的深度为k，由完全二叉树的定义知道，其前k-1层是深度为k-1的满二叉树，一共有$$2^{k-1}-1$$个结点。由于完全二叉树深度为k，故第k层上还有若干哥结点，因此，该完全二叉树的结点个数为$${n}\gt2^{k-1}-1$$.再者，由性质2知道$$n\le2^{k}-1$$.即</p>
+<p>​                        $$2^{k-1}-1\lt{n}\le2^{k}-1$$</p>
+<p>由此推导得：</p>
+<p>​                        $$2^{k-1}\le{n}\lt{2^{k}}$$</p>
+<p>取对数后有：</p>
+<p>​                        $$k-1\le{\log_2 n}\lt{k}$$</p>
+<p>因为k为整数，所以由k-1=$$\left \lfloor \log_2 n \right \rfloor$$,即可得k=$$\left \lfloor \log_2 n \right \rfloor$$+1</p>
+<h3 id="性质5-满二叉树原理，非空满二叉树的叶结点数等于其分支结点数加1"><a href="#性质5-满二叉树原理，非空满二叉树的叶结点数等于其分支结点数加1" class="headerlink" title="性质5:满二叉树原理，非空满二叉树的叶结点数等于其分支结点数加1."></a>性质5:满二叉树原理，非空满二叉树的叶结点数等于其分支结点数加1.</h3><p>证明：对n(分支结点个数)做数学归纳法</p>
+<p>​    归纳基础：没有分支结点的非空二叉树有一个叶结点。有一个分支结点的满二叉树有两个叶结点，即当n=0及n=1时此定理成立。</p>
+<p>​    归纳假设：设任意一棵有n-1个分支结点的满二叉树有n个叶结点。</p>
+<p>​    归纳步骤：假设树T有n个分支结点，取一个左右子结点均为叶结点的分支结点I，去掉I的两个子结点，则I成为叶结点，把新树记为T‘，T’有n-1个分支结点，根据归纳假设，T‘有n个叶结点，现在把两个叶结点归还给I。从而得到T有n个分支结点。即然T’有n哥叶结点，再加上两个则得到T有n+2个叶结点，但是再T‘中结点I被计算为叶结点，而现在则是分支结点，于是树T有n+1个叶结点和n个分支结点。</p>
+<p>​    因此，根据归纳原理，定理对于任意$$n\ge0$$成立</p>
+<h3 id="性质6-一棵非空二叉树空子树的数目等于其结点数目加1"><a href="#性质6-一棵非空二叉树空子树的数目等于其结点数目加1" class="headerlink" title="性质6:一棵非空二叉树空子树的数目等于其结点数目加1"></a>性质6:一棵非空二叉树空子树的数目等于其结点数目加1</h3><p>证明: 设二叉树为T,将其所有空子树换成叶节点,把新的二叉树记为T’.所有原来的树T的结点现在是树T’的分支结点.由于树T的所有分支结点都有两个子结点,并且树T中的每个叶结点在树T’中都有两个叶结点,所以树T’是满二叉树.根据满二叉树定理,新添加的叶结点数目等于树T的结点数目加1,而每个新添加的叶结点对应树T的一棵空子树,因此树T中空子树的数目等于树T中的结点数目加1.</p>
+<p>证明2: 根据定义,树T中每个结点都有两个子结点,因此一棵(实际上)有n个结点的二叉树由2n个子结点.除了根结点以外,每个结点都有一个父结点,于是共有n-1个父结点,即有n-1个非空子结点.既然子结点数目为2n,则其中有n+1个为空.</p>
+<h3 id="二叉树的实现"><a href="#二叉树的实现" class="headerlink" title="二叉树的实现"></a>二叉树的实现</h3><h4 id="实现原则"><a href="#实现原则" class="headerlink" title="实现原则:"></a>实现原则:</h4><p>​    1.以第一个建立的元素为根节点</p>
+<p>​    2.依次序将元素值与根节点做比较,若元素值大于根节点值,则将元素值往根节点的右子结点移动,如果右子结点为空,则将元素值插入,否则就重复比较,直到找到适当的空结点为止.若元素值小于根节点值,则将元素值往根节点的左子结点移动,若此左子结点为空,则将元素值插入,否则就重复比较,直到找到适当的空结点为止.</p>
+<h4 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式:"></a>实现方式:</h4><p>​    1.顺序存储结构</p>
+<p>​    对于满二叉树和完全二叉树来说，可以将其数据元素逐层存放到一组连续的存储单元中。用一维数组来实现顺序存储结构时，将二叉树中编号为i的结点存放到数组中的下标为i的分量中。可以得出结点i的父结点，左右孩子结点分别存放在$$\left \lfloor i/2 \right \rfloor$$、2i以及2i+1分量中。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tNc79ly1fvqqenyct0j30x00kun0k.jpg" alt="image-20180929212910892"></p>
+<p>这种存储方式对于满二叉树和完全二叉树是非常合适和高效的。因为满二叉树和完全二叉树采用顺序存储结构既不浪费空间，也可以根据公司很快的确定结点之间的关系。但是对一般的二叉树而言，必须使用“需结点”将一棵二叉树补成一棵完全二叉树来存储，否则无法确定结点之间的前驱后续关系，但是这样一来就会造成空间的浪费。一种极端的情况是，为了存储k个结点，需要$$2^k-1$$个存储单元。如果二叉树本身的结点数量少，就会造成存储空间的大量浪费。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1fvqqjy3lc2j30x00dkdhp.jpg" alt="image-20180929213418938"></p>
+<p>​    2.链式存储结构</p>
+<p>​    设计不同的结点结构可构成不同的链式存储结构。在二叉树中每个结点都有两个孩子，则可以设计每个结点至少包括三个域：数据域、左孩子域和右孩子域。数据域存放数据元素，左孩子域存放指向左孩子结点的指针，右孩子域存放指向右孩子结点的指针。利用此结点结构得到的二叉树存储结构称为二叉链表。在具有n个结点的二叉链表中有n+1个空链域。</p>
+<p><img src="/Users/anglecnn/Library/Application Support/typora-user-images/image-20180929221329842.png" alt="image-20180929221329842"></p>
+<p>为了方便找到父结点，可以在上述结点结构中增加一个指针域，指向结点的父结点。如上图6-5所示。采用此结点结构得到的二叉树存储结构称为三叉链表。在具有n个结点的三叉链表中也有n+1个空链域。</p>
+<p>不同的存储结构实现二叉树操作的方法也不同。例如要找某个结点的父结点，在三叉链表中很容易实现，而在二叉链表中则需从根结点出发一一查找。在实际应用中要根据二叉树的主要操作来选择存储结构。使用三叉链表实现的二叉树：</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/05/数据结构之树的基本概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -927,7 +1578,7 @@ b).除根以外的其他节点划分为m(m&gt;=0)个互不相交的有限集合T
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -938,7 +1589,7 @@ b).除根以外的其他节点划分为m(m&gt;=0)个互不相交的有限集合T
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -949,7 +1600,7 @@ b).除根以外的其他节点划分为m(m&gt;=0)个互不相交的有限集合T
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
