@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="spring," />
+  <meta name="keywords" content="大数据,Hadoop," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="目的：一个接口多个实现时，根据不同的条件调用不用的实现 1、有如下接口 123456789public interface Pay &amp;#123;	public Object pay(Map&amp;lt;String,Object&amp;gt; map);&amp;#125; 2、有如下两个实现 实现一： 12345678910111213141516171819202122232425@Service(&quot;weixin">
-<meta name="keywords" content="spring">
+<meta name="description" content="Hive的命令行1.hive –help123456789101112Usage ./hive &amp;lt;parameters&amp;gt; --service serviceName &amp;lt;service parameters&amp;gt;Service List: beeline cleardanglingscratchdir cli hbaseimport hbaseschematool help hi">
+<meta name="keywords" content="大数据,Hadoop">
 <meta property="og:type" content="article">
-<meta property="og:title" content="spring多实现类的解决方案">
-<meta property="og:url" content="http://yoursite.com/2018/09/15/spring多实现类的解决方案/index.html">
+<meta property="og:title" content="Hive学习笔记">
+<meta property="og:url" content="http://yoursite.com/2018/10/31/Hive学习笔记/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="目的：一个接口多个实现时，根据不同的条件调用不用的实现 1、有如下接口 123456789public interface Pay &amp;#123;	public Object pay(Map&amp;lt;String,Object&amp;gt; map);&amp;#125; 2、有如下两个实现 实现一： 12345678910111213141516171819202122232425@Service(&quot;weixin">
+<meta property="og:description" content="Hive的命令行1.hive –help123456789101112Usage ./hive &amp;lt;parameters&amp;gt; --service serviceName &amp;lt;service parameters&amp;gt;Service List: beeline cleardanglingscratchdir cli hbaseimport hbaseschematool help hi">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-15T13:55:31.612Z">
+<meta property="og:updated_time" content="2018-10-31T13:31:41.833Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="spring多实现类的解决方案">
-<meta name="twitter:description" content="目的：一个接口多个实现时，根据不同的条件调用不用的实现 1、有如下接口 123456789public interface Pay &amp;#123;	public Object pay(Map&amp;lt;String,Object&amp;gt; map);&amp;#125; 2、有如下两个实现 实现一： 12345678910111213141516171819202122232425@Service(&quot;weixin">
+<meta name="twitter:title" content="Hive学习笔记">
+<meta name="twitter:description" content="Hive的命令行1.hive –help123456789101112Usage ./hive &amp;lt;parameters&amp;gt; --service serviceName &amp;lt;service parameters&amp;gt;Service List: beeline cleardanglingscratchdir cli hbaseimport hbaseschematool help hi">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/09/15/spring多实现类的解决方案/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/10/31/Hive学习笔记/"/>
 
 
 
 
 
-  <title>spring多实现类的解决方案 | Hexo</title>
+  <title>Hive学习笔记 | Hexo</title>
   
 
 
@@ -293,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/15/spring多实现类的解决方案/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/31/Hive学习笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="anglecnn">
@@ -310,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">spring多实现类的解决方案</h1>
+          <h1 class="post-title" itemprop="name headline">Hive学习笔记</h1>
         
 
         <div class="post-meta">
@@ -322,8 +322,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-15T21:54:46+08:00">
-                2018-09-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-31T15:05:51+08:00">
+                2018-10-31
               </time>
             
 
@@ -345,8 +345,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ssm框架/" itemprop="url" rel="index">
-                    <span itemprop="name">ssm框架</span>
+                  <a href="/categories/hive/" itemprop="url" rel="index">
+                    <span itemprop="name">hive</span>
                   </a>
                 </span>
 
@@ -382,19 +382,45 @@
       
 
       
-        <p><strong>目的：</strong>一个接口多个实现时，根据不同的条件调用不用的实现</p>
-<p>1、有如下接口</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pay</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">pay</span><span class="params">(Map&lt;String,Object&gt; map)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2、有如下两个实现</p>
-<p>实现一：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"weixinPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WeixinPay</span> <span class="keyword">implements</span> <span class="title">Pay</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">pay</span><span class="params">(Map&lt;String, Object&gt; map)</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"weixinpay"</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>实现二：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"aliPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AliPay</span> <span class="keyword">implements</span> <span class="title">Pay</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">pay</span><span class="params">(Map&lt;String, Object&gt; map)</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"alipay"</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>3、根据不同的条件调用不同的实现</p>
-<p>方法一：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Resource</span>(name=<span class="string">"weixinPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay weixinPay;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Resource</span>(name=<span class="string">"aliPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay aliPay;</span><br></pre></td></tr></table></figure>
-<p>方法二：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"weixinPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay weixinPay;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"aliPay"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ShopPay aliPay;</span><br></pre></td></tr></table></figure>
+        <h2 id="Hive的命令行"><a href="#Hive的命令行" class="headerlink" title="Hive的命令行"></a>Hive的命令行</h2><h3 id="1-hive-–help"><a href="#1-hive-–help" class="headerlink" title="1.hive –help"></a>1.hive –help</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Usage ./hive &lt;parameters&gt; --service serviceName &lt;service parameters&gt;</span><br><span class="line">Service List: beeline cleardanglingscratchdir cli hbaseimport hbaseschematool help hiveburninclient hiveserver2 hplsql jar lineage llapdump llap llapstatus metastore metatool orcfiledump rcfilecat schemaTool version </span><br><span class="line">Parameters parsed:</span><br><span class="line">  --auxpath : Auxiliary jars </span><br><span class="line">  --config : Hive configuration directory</span><br><span class="line">  --service : Starts specific service/component. cli is default</span><br><span class="line">Parameters used:</span><br><span class="line">  HADOOP_HOME or HADOOP_PREFIX : Hadoop install directory</span><br><span class="line">  HIVE_OPT : Hive options</span><br><span class="line">For help on a particular service:</span><br><span class="line">  ./hive --service serviceName --help</span><br><span class="line">Debug help:  ./hive --debug --help</span><br></pre></td></tr></table></figure>
+<h3 id="2-hive-–help-–service-cli"><a href="#2-hive-–help-–service-cli" class="headerlink" title="2.hive –help –service cli"></a>2.hive –help –service cli</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-d,--define &lt;key=value&gt;          Variable substitution to apply to Hive</span><br><span class="line">                                  commands. e.g. -d A=B or --define A=B</span><br><span class="line">    --database &lt;databasename&gt;     Specify the database to use</span><br><span class="line"> -e &lt;quoted-query-string&gt;         SQL from command line</span><br><span class="line"> -f &lt;filename&gt;                    SQL from files</span><br><span class="line"> -H,--help                        Print help information</span><br><span class="line">    --hiveconf &lt;property=value&gt;   Use value for given property</span><br><span class="line">    --hivevar &lt;key=value&gt;         Variable substitution to apply to Hive</span><br><span class="line">                                  commands. e.g. --hivevar A=B</span><br><span class="line"> -i &lt;filename&gt;                    Initialization SQL file</span><br><span class="line"> -S,--silent                      Silent mode in interactive shell</span><br><span class="line"> -v,--verbose                     Verbose mode (echo executed SQL to the</span><br><span class="line">                                  console)</span><br></pre></td></tr></table></figure>
+<h3 id="3-变量和属性"><a href="#3-变量和属性" class="headerlink" title="3.变量和属性"></a>3.变量和属性</h3><p>–define key = value实际上和–hivevar key = value是等价的。二者都可以让用户在命令行定义用户自定义变量以便在Hive脚本中引用，来满足不同情况的执行。</p>
+<p>hive中变量和属性命名空间</p>
+<table>
+<thead>
+<tr>
+<th>命名空间</th>
+<th>使用权限</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hivevar</td>
+<td>可读/可写</td>
+<td>用户自定义变量</td>
+</tr>
+<tr>
+<td>hiveconf</td>
+<td>可读/可写</td>
+<td>hive相关的配置属性</td>
+</tr>
+<tr>
+<td>system</td>
+<td>可读/可写</td>
+<td>java定义的配置属性</td>
+</tr>
+<tr>
+<td>env</td>
+<td>只可读</td>
+<td>Shell环境(例如bash)定义的环境变量</td>
+</tr>
+</tbody>
+</table>
+<p>Hive变量内部是以java字符串的方式存储的。用户可以在查询中引用变量，Hive会先使用变量值替换掉查询的变量引用，然后才会将查询语句提交给查询处理器。</p>
+<p>在Cli中，可以使用SET命令显示或者修改变量值。可以使用set或set -v查看更多的信息。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">hive&gt;</span> set env:HOME;</span><br><span class="line">env:HOME=/root</span><br></pre></td></tr></table></figure>
+
       
     </div>
     
@@ -411,7 +437,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/spring/" rel="tag"># spring</a>
+            <a href="/tags/大数据-Hadoop/" rel="tag"># 大数据,Hadoop</a>
           
         </div>
       
@@ -424,8 +450,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/15/Spring框架报错java-lang-NoClassDefFoundError-org-springframework-core-ErrorCoded/" rel="next" title="Spring框架报错java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded">
-                <i class="fa fa-chevron-left"></i> Spring框架报错java.lang.NoClassDefFoundError: org/springframework/core/ErrorCoded
+              <a href="/2018/10/30/reduce端join/" rel="next" title="reduce端join">
+                <i class="fa fa-chevron-left"></i> reduce端join
               </a>
             
           </div>
@@ -434,8 +460,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/10/29/Map端连接/" rel="prev" title="Map端连接">
-                Map端连接 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/11/01/线性回归/" rel="prev" title="线性回归">
+                线性回归 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -488,8 +514,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -549,6 +584,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hive的命令行"><span class="nav-number">1.</span> <span class="nav-text">Hive的命令行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-hive-–help"><span class="nav-number">1.1.</span> <span class="nav-text">1.hive –help</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-hive-–help-–service-cli"><span class="nav-number">1.2.</span> <span class="nav-text">2.hive –help –service cli</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-变量和属性"><span class="nav-number">1.3.</span> <span class="nav-text">3.变量和属性</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
